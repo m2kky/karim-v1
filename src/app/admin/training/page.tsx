@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createOverlayState } from '@/lib/overlay-state';
-import { Button, Card, Input, Modal, Table, TextArea, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/react";
+import { Button, Card, Input, Modal, TextArea } from "@heroui/react";
 import { getTrainingInfo, getTrainingStats, updateTrainingInfo, upsertTrainingStat, deleteTrainingStat } from './actions';
 import toast from 'react-hot-toast';
 
@@ -117,28 +117,56 @@ export default function TrainingAdminPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="admin-page">
+        <div className="admin-page-header">
+          <div>
+            <div className="admin-eyebrow">Content</div>
+            <h1 className="admin-title">Training Page Content</h1>
+            <p className="admin-subtitle">Loading training settings and statistics.</p>
+          </div>
+        </div>
+        <Card className="admin-panel">
+          <div className="admin-empty">Loading...</div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-6xl">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Training Page Content</h1>
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div>
+          <div className="admin-eyebrow">Content</div>
+          <h1 className="admin-title">Training Page Content</h1>
+          <p className="admin-subtitle">
+            Manage the public mentorship page copy, Arabic translations, feature bullets, and top-line training stats.
+          </p>
+        </div>
       </div>
 
       {/* TRAINING INFO FORM */}
-      <Card className="mb-12">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold mb-6">General Information</h2>
+      <Card className="admin-panel">
+        <Card.Header className="admin-panel-header">
+          <div>
+            <h2 className="admin-section-title">General Information</h2>
+            <p className="admin-subtitle">This content feeds the public training page in both languages.</p>
+          </div>
+        </Card.Header>
+        <Card.Content className="admin-panel-body">
           <form onSubmit={handleSaveInfo} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Title (English)</label>
+            <div className="admin-form-grid">
+              <div className="admin-field">
+                <label>Title (English)</label>
                 <Input
                   name="title"
                   defaultValue={info?.title || ''}
                   variant="secondary"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Title (Arabic)</label>
+              <div className="admin-field">
+                <label>Title (Arabic)</label>
                 <Input
                   name="titleAr"
                   defaultValue={info?.titleAr || ''}
@@ -147,8 +175,8 @@ export default function TrainingAdminPage() {
                 />
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Description (English)</label>
+              <div className="admin-field admin-field-wide">
+                <label>Description (English)</label>
                 <TextArea
                   name="description"
                   defaultValue={info?.description || ''}
@@ -157,8 +185,8 @@ export default function TrainingAdminPage() {
                 />
               </div>
 
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-300 mb-1">Description (Arabic)</label>
+              <div className="admin-field admin-field-wide">
+                <label>Description (Arabic)</label>
                 <TextArea
                   name="descriptionAr"
                   defaultValue={info?.descriptionAr || ''}
@@ -168,8 +196,8 @@ export default function TrainingAdminPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Features/Points (English, one per line)</label>
+              <div className="admin-field">
+                <label>Features/Points (English, one per line)</label>
                 <TextArea
                   value={points}
                   onChange={(e) => setPoints(e.target.value)}
@@ -178,8 +206,8 @@ export default function TrainingAdminPage() {
                   placeholder="Point 1\nPoint 2\n..."
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Features/Points (Arabic, one per line)</label>
+              <div className="admin-field">
+                <label>Features/Points (Arabic, one per line)</label>
                 <TextArea
                   value={pointsAr}
                   onChange={(e) => setPointsAr(e.target.value)}
@@ -191,62 +219,64 @@ export default function TrainingAdminPage() {
               </div>
             </div>
 
-            <div className="flex justify-end">
-              <Button type="submit" className="bg-blue-600">Save General Info</Button>
+            <div className="admin-actions">
+              <Button type="submit" className="admin-button-primary">Save General Info</Button>
             </div>
           </form>
-        </div>
+        </Card.Content>
       </Card>
 
-      <hr className="my-8 border-[rgba(255,255,255,0.1)]" />
-
       {/* TRAINING STATS */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Training Stats</h2>
-        <Button onPress={handleAddNewStat} variant="secondary">
-          Add New Stat
-        </Button>
-      </div>
-
-      <Card>
-        <div className="p-0">
+      <Card className="admin-panel">
+        <Card.Header className="admin-panel-header">
+          <div>
+            <h2 className="admin-section-title">Training Stats</h2>
+            <p className="admin-subtitle">Numbers shown in the training section.</p>
+          </div>
+          <Button onPress={handleAddNewStat} variant="secondary" className="admin-button-secondary">
+            Add New Stat
+          </Button>
+        </Card.Header>
+        <Card.Content className="admin-panel-body">
           {!stats || stats.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 bg-black/20 rounded-lg border border-[rgba(255,255,255,0.05)] mt-4">
+            <div className="admin-empty">
               No stats found.
             </div>
           ) : (
-            <Table>
-              <Table.Content aria-label="Training Stats">
-              <TableHeader>
-                <TableColumn>ORDER</TableColumn>
-                <TableColumn>NUMBER / METRIC</TableColumn>
-                <TableColumn>LABEL</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
-              </TableHeader>
-              <TableBody items={stats}>
-                {(item: any) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.order}</TableCell>
-                    <TableCell className="font-medium text-xl text-blue-400">{item.number}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span>{item.label}</span>
-                        <span className="text-xs text-gray-500">{item.labelAr}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-center gap-2">
-                        <Button size="sm" variant="secondary" onPress={() => handleEditStat(item)}>Edit</Button>
-                        <Button size="sm" variant="secondary" onPress={() => handleDeleteStat(item.id)}>Delete</Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-              </Table.Content>
-            </Table>
+            <div className="admin-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Number / Metric</th>
+                    <th>Label</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.map((item: any) => (
+                    <tr key={item.id}>
+                      <td>{item.order}</td>
+                      <td className="admin-stat-value">{item.number}</td>
+                      <td>
+                        <div className="flex flex-col gap-1">
+                          <span>{item.label}</span>
+                          <span className="admin-muted text-xs" dir="rtl">{item.labelAr}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="flex flex-wrap gap-2">
+                          <Button size="sm" variant="secondary" className="admin-button-secondary" onPress={() => handleEditStat(item)}>Edit</Button>
+                          <Button size="sm" variant="secondary" className="admin-button-secondary" onPress={() => handleDeleteStat(item.id)}>Delete</Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </div>
+        </Card.Content>
       </Card>
 
       {/* STAT MODAL */}
@@ -257,8 +287,8 @@ export default function TrainingAdminPage() {
               <Modal.Header>{editingStat ? 'Edit Stat' : 'Add New Stat'}</Modal.Header>
               <Modal.Body className="py-6">
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Order</label>
+                  <div className="admin-field">
+                    <label>Order</label>
                     <Input
                       name="order"
                       type="number"
@@ -268,8 +298,8 @@ export default function TrainingAdminPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Number / Value</label>
+                  <div className="admin-field">
+                    <label>Number / Value</label>
                     <Input
                       name="number"
                       defaultValue={editingStat?.number}
@@ -279,8 +309,8 @@ export default function TrainingAdminPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Label (English)</label>
+                  <div className="admin-field">
+                    <label>Label (English)</label>
                     <Input
                       name="label"
                       defaultValue={editingStat?.label}
@@ -289,8 +319,8 @@ export default function TrainingAdminPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Label (Arabic)</label>
+                  <div className="admin-field">
+                    <label>Label (Arabic)</label>
                     <Input
                       name="labelAr"
                       defaultValue={editingStat?.labelAr}
@@ -302,7 +332,7 @@ export default function TrainingAdminPage() {
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="ghost" onPress={onClose}>Cancel</Button>
-                <Button type="submit" className="bg-blue-600">Save Stat</Button>
+                <Button type="submit" className="admin-button-primary">Save Stat</Button>
               </Modal.Footer>
             </form>
           )}

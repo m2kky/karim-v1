@@ -64,7 +64,7 @@ export default function AdminSidebar() {
       {/* Mobile Toggle */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden fixed top-4 left-4 z-[60] p-2 bg-[#111] rounded-lg border border-white/10 text-white"
+        className="md:hidden fixed top-4 left-4 z-[60] p-3 bg-[#111] rounded-xl border border-white/10 text-white shadow-2xl shadow-black/30"
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
@@ -78,13 +78,13 @@ export default function AdminSidebar() {
       )}
 
       <aside className={clsx(
-        "w-[260px] border-l border-white/5 bg-[#050505] fixed inset-y-0 end-0 z-50 flex flex-col transition-transform duration-300 ease-in-out",
+        "admin-sidebar fixed inset-y-0 end-0 z-50 flex flex-col transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"
       )}>
         {/* Logo */}
-      <div className="h-[72px] flex items-center px-6 border-b border-white/5">
+      <div className="admin-sidebar-brand flex items-center">
         <Link href="/admin" className="flex items-center gap-3 no-underline transition-opacity hover:opacity-80">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-blue-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-blue-500/20">
             KA
           </div>
           <div className="flex flex-col justify-center">
@@ -119,9 +119,9 @@ export default function AdminSidebar() {
                     key={item.href}
                     href={item.href}
                     className={clsx(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] no-underline transition-all duration-200 group",
+                      "admin-sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] no-underline transition-all duration-200 group",
                       isActive
-                        ? "bg-white/10 text-white font-medium shadow-sm"
+                        ? "admin-sidebar-link-active font-medium shadow-sm"
                         : "text-neutral-400 hover:bg-white/5 hover:text-white"
                     )}
                   >
