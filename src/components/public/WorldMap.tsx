@@ -21,6 +21,8 @@ const mapCountriesData = [
   {name:'Australia',     name_ar:'أستراليا',flag:'🇦🇺', lat:-25.3, lng: 133.7}
 ];
 
+const getCurrentLang = () => (typeof document !== 'undefined' && document.documentElement.lang === 'ar' ? 'ar' : 'en');
+
 export default function WorldMap() {
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -36,7 +38,9 @@ export default function WorldMap() {
       // So we don't rely heavily on dataset.built here, or we clear it on unmount
 
       try {
-        const world = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
+        const response = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+        if (!response.ok) throw new Error('World atlas request failed');
+        const world = await response.json();
         if (!isMounted) return;
         
         const land = topojson.feature(world, world.objects.countries as any);
@@ -70,6 +74,7 @@ export default function WorldMap() {
 
         drawMarkersAndLines(svg, positions);
         setupMapPopups();
+        syncMapLanguage();
         
         const loading = document.getElementById('mapLoading');
         if(loading) loading.classList.add('hidden');
@@ -77,6 +82,7 @@ export default function WorldMap() {
         console.error('Map load failed:', e);
         if (!isMounted) return;
         
+        drawFallbackContinents(svg);
         const positions: any = {};
         mapCountriesData.forEach(c => {
           const x = ((c.lng + 180) / 360) * 1000;
@@ -85,10 +91,37 @@ export default function WorldMap() {
         });
         drawMarkersAndLines(svg, positions);
         setupMapPopups();
+        syncMapLanguage();
         
         const loading = document.getElementById('mapLoading');
         if(loading) loading.classList.add('hidden');
       }
+    }
+
+    function drawFallbackContinents(svgNode: SVGSVGElement) {
+      const ns = 'http://www.w3.org/2000/svg';
+      const continentsGroup = svgNode.querySelector('#continents-paths');
+      if (!continentsGroup) return;
+      continentsGroup.innerHTML = '';
+
+      const fallbackPaths = [
+        'M105 170 C150 115 245 115 295 170 C328 208 305 260 250 273 C184 288 116 254 105 170 Z',
+        'M245 295 C292 280 342 306 348 354 C354 407 306 454 264 426 C226 400 220 328 245 295 Z',
+        'M430 150 C510 104 628 126 660 202 C690 274 626 326 530 316 C446 307 382 224 430 150 Z',
+        'M575 304 C640 294 704 346 698 410 C691 480 590 478 558 420 C536 380 538 326 575 304 Z',
+        'M685 188 C760 145 862 162 904 226 C940 280 898 332 812 318 C740 306 666 252 685 188 Z',
+        'M774 356 C836 340 900 376 918 428 C864 462 792 452 760 410 C746 392 750 368 774 356 Z'
+      ];
+
+      fallbackPaths.forEach((d) => {
+        const path = document.createElementNS(ns, 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('fill', 'rgba(58,127,199,0.06)');
+        path.setAttribute('stroke', 'rgba(127,196,255,0.55)');
+        path.setAttribute('stroke-width', '0.7');
+        path.setAttribute('filter', 'url(#continentGlow)');
+        continentsGroup.appendChild(path);
+      });
     }
 
     function drawMarkersAndLines(svgNode: SVGSVGElement, positions: any) {
@@ -197,7 +230,7 @@ export default function WorldMap() {
         label.style.pointerEvents = 'none';
         label.dataset.en = c.name;
         label.dataset.ar = c.name_ar;
-        label.textContent = c.name;
+        label.textContent = getCurrentLang() === 'ar' ? c.name_ar : c.name;
         markersGroup.appendChild(label);
 
         const hit = document.createElementNS(ns, 'circle');
@@ -208,6 +241,8 @@ export default function WorldMap() {
         hit.style.cursor = 'pointer';
         hit.classList.add('map-hit');
         hit.dataset.name = c.name;
+        hit.dataset.nameEn = c.name;
+        hit.dataset.nameAr = c.name_ar;
         hit.dataset.flag = c.flag;
         hit.dataset.cx = p.x;
         hit.dataset.cy = p.y;
@@ -244,7 +279,7 @@ export default function WorldMap() {
             const flagEl = popup.querySelector('.flag');
             const nameEl = popup.querySelector('.name');
             if (flagEl) flagEl.textContent = m.dataset.flag;
-            if (nameEl) nameEl.textContent = m.dataset.name;
+            if (nameEl) nameEl.textContent = getCurrentLang() === 'ar' ? (m.dataset.nameAr || m.dataset.name) : (m.dataset.nameEn || m.dataset.name);
             popup.style.left = px + 'px';
             popup.style.top = py + 'px';
             popup.classList.add('show');
@@ -256,10 +291,22 @@ export default function WorldMap() {
       });
     }
 
+    function syncMapLanguage() {
+      if (!svg) return;
+      const lang = getCurrentLang();
+      svg.querySelectorAll<SVGTextElement>('#markers text[data-en]').forEach((label) => {
+        label.textContent = lang === 'ar' ? (label.dataset.ar || label.dataset.en || '') : (label.dataset.en || '');
+      });
+      const popup = document.getElementById('country-popup');
+      if (popup) popup.classList.remove('show');
+    }
+
     buildWorldMap();
+    document.addEventListener('languagechange', syncMapLanguage);
 
     return () => {
       isMounted = false;
+      document.removeEventListener('languagechange', syncMapLanguage);
     };
   }, []);
 

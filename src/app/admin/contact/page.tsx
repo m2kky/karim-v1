@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import { createOverlayState } from '@/lib/overlay-state';
 import { Button, Card, Input, Modal, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, TextArea } from '@heroui/react';
 import toast from 'react-hot-toast';
-import { quickBriefOptionsToText, type QuickBriefConfig } from '@/lib/quick-brief';
-import { deleteSocialLink, getAllSocialLinks, getContactInfo, getQuickBriefConfig, updateContactInfo, updateQuickBriefConfig, upsertSocialLink } from './actions';
+import { quickBriefOptionsToText, type MentorshipBriefConfig, type QuickBriefConfig } from '@/lib/quick-brief';
+import { deleteSocialLink, getAllSocialLinks, getContactInfo, getMentorshipBriefConfig, getQuickBriefConfig, updateContactInfo, updateMentorshipBriefConfig, updateQuickBriefConfig, upsertSocialLink } from './actions';
 
 export default function ContactAdminPage() {
   const [contact, setContact] = useState<any>({});
   const [quickBrief, setQuickBrief] = useState<QuickBriefConfig | null>(null);
+  const [mentorshipBrief, setMentorshipBrief] = useState<MentorshipBriefConfig | null>(null);
   const [socials, setSocials] = useState<any[]>([]);
   const [editingSocial, setEditingSocial] = useState<any | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -18,10 +19,16 @@ export default function ContactAdminPage() {
 
   const loadData = async () => {
     setIsLoading(true);
-    const [contactData, socialData, quickBriefData] = await Promise.all([getContactInfo(), getAllSocialLinks(), getQuickBriefConfig()]);
+    const [contactData, socialData, quickBriefData, mentorshipBriefData] = await Promise.all([
+      getContactInfo(),
+      getAllSocialLinks(),
+      getQuickBriefConfig(),
+      getMentorshipBriefConfig(),
+    ]);
     setContact(contactData || {});
     setSocials(socialData || []);
     setQuickBrief(quickBriefData);
+    setMentorshipBrief(mentorshipBriefData);
     setIsLoading(false);
   };
 
@@ -62,6 +69,17 @@ export default function ContactAdminPage() {
       loadData();
     } else {
       toast.error('Failed to save Quick Brief settings');
+    }
+  };
+
+  const handleMentorshipBriefSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const res = await updateMentorshipBriefConfig(new FormData(e.currentTarget));
+    if (res.success) {
+      toast.success('Mentorship Brief settings saved');
+      loadData();
+    } else {
+      toast.error('Failed to save Mentorship Brief settings');
     }
   };
 
@@ -178,6 +196,79 @@ export default function ContactAdminPage() {
           </Card>
           <div className="flex justify-end">
             <Button type="submit" className="bg-blue-600 px-8">Save Quick Brief</Button>
+          </div>
+        </form>
+      )}
+
+      {mentorshipBrief && (
+        <form onSubmit={handleMentorshipBriefSubmit} className="mb-10" key={JSON.stringify(mentorshipBrief)}>
+          <Card>
+            <Card.Header className="border-b border-white/5 bg-[#050505]/50 px-6 py-4">
+              <div>
+                <h2 className="text-xl font-semibold">Mentorship Brief Modal</h2>
+                <p className="text-sm text-gray-400 mt-1">Control mentorship-specific questions, labels, placeholders, and answer choices.</p>
+              </div>
+            </Card.Header>
+            <Card.Content className="p-6 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Field label="Eyebrow" name="mentorshipEyebrow" value={mentorshipBrief.eyebrow} />
+                <Field label="Eyebrow Arabic" name="mentorshipEyebrowAr" value={mentorshipBrief.eyebrowAr} rtl />
+                <Field label="Title" name="mentorshipTitle" value={mentorshipBrief.title} />
+                <Field label="Title Arabic" name="mentorshipTitleAr" value={mentorshipBrief.titleAr} rtl />
+                <TextField label="Subtitle" name="mentorshipSubtitle" value={mentorshipBrief.subtitle} />
+                <TextField label="Subtitle Arabic" name="mentorshipSubtitleAr" value={mentorshipBrief.subtitleAr} rtl />
+                <Field label="Name label" name="mentorshipNameLabel" value={mentorshipBrief.nameLabel} />
+                <Field label="Name label Arabic" name="mentorshipNameLabelAr" value={mentorshipBrief.nameLabelAr} rtl />
+                <Field label="Name placeholder" name="mentorshipNamePlaceholder" value={mentorshipBrief.namePlaceholder} />
+                <Field label="Name placeholder Arabic" name="mentorshipNamePlaceholderAr" value={mentorshipBrief.namePlaceholderAr} rtl />
+                <Field label="Level label" name="mentorshipLevelLabel" value={mentorshipBrief.levelLabel} />
+                <Field label="Level label Arabic" name="mentorshipLevelLabelAr" value={mentorshipBrief.levelLabelAr} rtl />
+                <Field label="Goal label" name="mentorshipGoalLabel" value={mentorshipBrief.goalLabel} />
+                <Field label="Goal label Arabic" name="mentorshipGoalLabelAr" value={mentorshipBrief.goalLabelAr} rtl />
+                <Field label="Format label" name="mentorshipFormatLabel" value={mentorshipBrief.formatLabel} />
+                <Field label="Format label Arabic" name="mentorshipFormatLabelAr" value={mentorshipBrief.formatLabelAr} rtl />
+                <Field label="Timeline label" name="mentorshipTimelineLabel" value={mentorshipBrief.timelineLabel} />
+                <Field label="Timeline label Arabic" name="mentorshipTimelineLabelAr" value={mentorshipBrief.timelineLabelAr} rtl />
+                <Field label="Details label" name="mentorshipDetailsLabel" value={mentorshipBrief.detailsLabel} />
+                <Field label="Details label Arabic" name="mentorshipDetailsLabelAr" value={mentorshipBrief.detailsLabelAr} rtl />
+                <Field label="Details placeholder" name="mentorshipDetailsPlaceholder" value={mentorshipBrief.detailsPlaceholder} />
+                <Field label="Details placeholder Arabic" name="mentorshipDetailsPlaceholderAr" value={mentorshipBrief.detailsPlaceholderAr} rtl />
+                <Field label="Connect label" name="mentorshipConnectLabel" value={mentorshipBrief.connectLabel} />
+                <Field label="Connect label Arabic" name="mentorshipConnectLabelAr" value={mentorshipBrief.connectLabelAr} rtl />
+                <Field label="Summary title" name="mentorshipSummaryTitle" value={mentorshipBrief.summaryTitle} />
+                <Field label="Summary title Arabic" name="mentorshipSummaryTitleAr" value={mentorshipBrief.summaryTitleAr} rtl />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <OptionsField
+                  label="Level options"
+                  name="mentorshipLevels"
+                  value={quickBriefOptionsToText(mentorshipBrief.levels, true)}
+                  hint="Format: Label | Arabic label | Value | Icon"
+                />
+                <OptionsField
+                  label="Goal options"
+                  name="mentorshipGoals"
+                  value={quickBriefOptionsToText(mentorshipBrief.goals, true)}
+                  hint="Format: Label | Arabic label | Value | Icon"
+                />
+                <OptionsField
+                  label="Format options"
+                  name="mentorshipFormats"
+                  value={quickBriefOptionsToText(mentorshipBrief.formats, false)}
+                  hint="Format: Label | Arabic label | Value"
+                />
+                <OptionsField
+                  label="Timeline options"
+                  name="mentorshipTimelines"
+                  value={quickBriefOptionsToText(mentorshipBrief.timelines, true)}
+                  hint="Format: Label | Arabic label | Value | Icon"
+                />
+              </div>
+            </Card.Content>
+          </Card>
+          <div className="flex justify-end">
+            <Button type="submit" className="bg-blue-600 px-8">Save Mentorship Brief</Button>
           </div>
         </form>
       )}

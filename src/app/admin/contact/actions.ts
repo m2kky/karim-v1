@@ -6,12 +6,15 @@ import { eq } from 'drizzle-orm';
 import { asc } from '@/lib/db-order';
 import { revalidatePath } from 'next/cache';
 import {
+  DEFAULT_MENTORSHIP_BRIEF_CONFIG,
   DEFAULT_QUICK_BRIEF_CONFIG,
+  normalizeMentorshipBriefConfig,
   normalizeQuickBriefConfig,
   parseQuickBriefOptionsText,
 } from '@/lib/quick-brief';
 
 const QUICK_BRIEF_SETTINGS_KEY = 'quick_brief_config';
+const MENTORSHIP_BRIEF_SETTINGS_KEY = 'mentorship_brief_config';
 
 export async function getContactInfo() {
   const [data] = await db.select().from(contactInfo).limit(1);
@@ -82,6 +85,64 @@ export async function updateQuickBriefConfig(formData: FormData) {
 
   await db.insert(settings).values({
     key: QUICK_BRIEF_SETTINGS_KEY,
+    value: data,
+    updatedAt: new Date(),
+  }).onConflictDoUpdate({
+    target: settings.key,
+    set: { value: data, updatedAt: new Date() },
+  });
+
+  revalidatePath('/');
+  revalidatePath('/admin/contact');
+  return { success: true };
+}
+
+export async function getMentorshipBriefConfig() {
+  const [row] = await db
+    .select({ value: settings.value })
+    .from(settings)
+    .where(eq(settings.key, MENTORSHIP_BRIEF_SETTINGS_KEY))
+    .limit(1);
+
+  return normalizeMentorshipBriefConfig(row?.value ?? DEFAULT_MENTORSHIP_BRIEF_CONFIG);
+}
+
+export async function updateMentorshipBriefConfig(formData: FormData) {
+  const data = normalizeMentorshipBriefConfig({
+    eyebrow: (formData.get('mentorshipEyebrow') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.eyebrow,
+    eyebrowAr: (formData.get('mentorshipEyebrowAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.eyebrowAr,
+    title: (formData.get('mentorshipTitle') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.title,
+    titleAr: (formData.get('mentorshipTitleAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.titleAr,
+    subtitle: (formData.get('mentorshipSubtitle') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.subtitle,
+    subtitleAr: (formData.get('mentorshipSubtitleAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.subtitleAr,
+    nameLabel: (formData.get('mentorshipNameLabel') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.nameLabel,
+    nameLabelAr: (formData.get('mentorshipNameLabelAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.nameLabelAr,
+    namePlaceholder: (formData.get('mentorshipNamePlaceholder') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.namePlaceholder,
+    namePlaceholderAr: (formData.get('mentorshipNamePlaceholderAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.namePlaceholderAr,
+    levelLabel: (formData.get('mentorshipLevelLabel') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.levelLabel,
+    levelLabelAr: (formData.get('mentorshipLevelLabelAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.levelLabelAr,
+    goalLabel: (formData.get('mentorshipGoalLabel') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.goalLabel,
+    goalLabelAr: (formData.get('mentorshipGoalLabelAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.goalLabelAr,
+    formatLabel: (formData.get('mentorshipFormatLabel') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.formatLabel,
+    formatLabelAr: (formData.get('mentorshipFormatLabelAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.formatLabelAr,
+    timelineLabel: (formData.get('mentorshipTimelineLabel') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.timelineLabel,
+    timelineLabelAr: (formData.get('mentorshipTimelineLabelAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.timelineLabelAr,
+    detailsLabel: (formData.get('mentorshipDetailsLabel') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.detailsLabel,
+    detailsLabelAr: (formData.get('mentorshipDetailsLabelAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.detailsLabelAr,
+    detailsPlaceholder: (formData.get('mentorshipDetailsPlaceholder') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.detailsPlaceholder,
+    detailsPlaceholderAr: (formData.get('mentorshipDetailsPlaceholderAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.detailsPlaceholderAr,
+    connectLabel: (formData.get('mentorshipConnectLabel') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.connectLabel,
+    connectLabelAr: (formData.get('mentorshipConnectLabelAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.connectLabelAr,
+    summaryTitle: (formData.get('mentorshipSummaryTitle') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.summaryTitle,
+    summaryTitleAr: (formData.get('mentorshipSummaryTitleAr') as string) || DEFAULT_MENTORSHIP_BRIEF_CONFIG.summaryTitleAr,
+    levels: parseQuickBriefOptionsText(formData.get('mentorshipLevels'), true),
+    goals: parseQuickBriefOptionsText(formData.get('mentorshipGoals'), true),
+    formats: parseQuickBriefOptionsText(formData.get('mentorshipFormats'), false),
+    timelines: parseQuickBriefOptionsText(formData.get('mentorshipTimelines'), true),
+  });
+
+  await db.insert(settings).values({
+    key: MENTORSHIP_BRIEF_SETTINGS_KEY,
     value: data,
     updatedAt: new Date(),
   }).onConflictDoUpdate({

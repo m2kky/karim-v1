@@ -38,6 +38,39 @@ export type QuickBriefConfig = {
   timelines: QuickBriefOption[];
 };
 
+export type MentorshipBriefConfig = {
+  eyebrow: string;
+  eyebrowAr: string;
+  title: string;
+  titleAr: string;
+  subtitle: string;
+  subtitleAr: string;
+  nameLabel: string;
+  nameLabelAr: string;
+  namePlaceholder: string;
+  namePlaceholderAr: string;
+  levelLabel: string;
+  levelLabelAr: string;
+  goalLabel: string;
+  goalLabelAr: string;
+  formatLabel: string;
+  formatLabelAr: string;
+  timelineLabel: string;
+  timelineLabelAr: string;
+  detailsLabel: string;
+  detailsLabelAr: string;
+  detailsPlaceholder: string;
+  detailsPlaceholderAr: string;
+  connectLabel: string;
+  connectLabelAr: string;
+  summaryTitle: string;
+  summaryTitleAr: string;
+  levels: QuickBriefOption[];
+  goals: QuickBriefOption[];
+  formats: QuickBriefOption[];
+  timelines: QuickBriefOption[];
+};
+
 export const DEFAULT_QUICK_BRIEF_CONFIG: QuickBriefConfig = {
   eyebrow: 'Quick Brief',
   eyebrowAr: 'نموذج سريع',
@@ -89,7 +122,76 @@ export const DEFAULT_QUICK_BRIEF_CONFIG: QuickBriefConfig = {
   ],
 };
 
+export const DEFAULT_MENTORSHIP_BRIEF_CONFIG: MentorshipBriefConfig = {
+  eyebrow: 'Mentorship Brief',
+  eyebrowAr: 'بريف المنتورنج',
+  title: 'Tell me about your editing goals',
+  titleAr: 'احكيلي عن هدفك في المونتاج',
+  subtitle: 'A focused brief so I can suggest the right mentorship path.',
+  subtitleAr: 'بريف سريع عشان أقترحلك مسار منتورنج مناسب.',
+  nameLabel: "What's your name?",
+  nameLabelAr: 'اسمك إيه؟',
+  namePlaceholder: 'Your name',
+  namePlaceholderAr: 'اسمك',
+  levelLabel: 'Where are you now?',
+  levelLabelAr: 'مستواك الحالي إيه؟',
+  goalLabel: 'What do you want to improve?',
+  goalLabelAr: 'عايز تطور إيه؟',
+  formatLabel: 'Preferred mentorship format?',
+  formatLabelAr: 'شكل المنتورنج المناسب؟',
+  timelineLabel: 'When do you want to start?',
+  timelineLabelAr: 'تحب نبدأ إمتى؟',
+  detailsLabel: 'Portfolio links or context? (optional)',
+  detailsLabelAr: 'روابط البورتفوليو أو تفاصيل؟ (اختياري)',
+  detailsPlaceholder: 'Portfolio link, weak points, software you use...',
+  detailsPlaceholderAr: 'لينك البورتفوليو، نقاط الضعف، البرامج اللي بتستخدمها...',
+  connectLabel: 'How should we connect?',
+  connectLabelAr: 'نتواصل إزاي؟',
+  summaryTitle: 'Your mentorship brief',
+  summaryTitleAr: 'ملخص المنتورنج',
+  levels: [
+    { icon: '🌱', label: 'Beginner', labelAr: 'مبتدئ', value: 'Beginner' },
+    { icon: '✂️', label: 'Intermediate editor', labelAr: 'مستوى متوسط', value: 'Intermediate' },
+    { icon: '🎬', label: 'Working editor', labelAr: 'مونتير شغال', value: 'Working editor' },
+    { icon: '🚀', label: 'Want to go pro', labelAr: 'عايز أحترف', value: 'Going pro' },
+  ],
+  goals: [
+    { icon: '🧠', label: 'Editing decisions', labelAr: 'قرارات المونتاج', value: 'Editing decisions' },
+    { icon: '🎨', label: 'Color and look', labelAr: 'الألوان واللوك', value: 'Color and look' },
+    { icon: '📁', label: 'Portfolio review', labelAr: 'مراجعة بورتفوليو', value: 'Portfolio review' },
+    { icon: '💼', label: 'Pricing and clients', labelAr: 'التسعير والعملاء', value: 'Pricing and clients' },
+    { icon: '📱', label: 'Reels and social content', labelAr: 'ريلز وسوشيال', value: 'Reels and social content' },
+  ],
+  formats: [
+    { label: '1:1 session', labelAr: 'جلسة 1:1', value: '1:1 session' },
+    { label: 'Portfolio audit', labelAr: 'مراجعة بورتفوليو', value: 'Portfolio audit' },
+    { label: 'Multi-session mentorship', labelAr: 'منتورنج على كذا جلسة', value: 'Multi-session mentorship' },
+    { label: 'Not sure yet', labelAr: 'مش متأكد لسه', value: 'Not sure yet' },
+  ],
+  timelines: [
+    { icon: '⚡', label: 'ASAP', labelAr: 'حالاً', value: 'ASAP' },
+    { icon: '📅', label: 'This week', labelAr: 'الأسبوع ده', value: 'This week' },
+    { icon: '📆', label: 'This month', labelAr: 'الشهر ده', value: 'This month' },
+    { icon: '↔', label: 'Flexible', labelAr: 'مرن', value: 'Flexible' },
+  ],
+};
+
 const optionListKeys = ['projectTypes', 'budgets', 'timelines'] as const;
+const mentorshipOptionListKeys = ['levels', 'goals', 'formats', 'timelines'] as const;
+
+function normalizeOptions(options: unknown, fallback: QuickBriefOption[]) {
+  const value = Array.isArray(options) ? options : fallback;
+  return value
+    .filter((option): option is QuickBriefOption => Boolean(option && option.label))
+    .filter((option) => option.active !== false)
+    .map((option) => ({
+      label: option.label,
+      labelAr: option.labelAr || option.label,
+      value: option.value || option.label,
+      icon: option.icon || '',
+      active: option.active !== false,
+    }));
+}
 
 export function normalizeQuickBriefConfig(input: unknown): QuickBriefConfig {
   const raw = input && typeof input === 'object' ? (input as Partial<QuickBriefConfig>) : {};
@@ -97,17 +199,19 @@ export function normalizeQuickBriefConfig(input: unknown): QuickBriefConfig {
 
   for (const key of optionListKeys) {
     const fallback = DEFAULT_QUICK_BRIEF_CONFIG[key];
-    const value = Array.isArray(raw[key]) ? raw[key] : fallback;
-    merged[key] = value
-      .filter((option): option is QuickBriefOption => Boolean(option && option.label))
-      .filter((option) => option.active !== false)
-      .map((option) => ({
-        label: option.label,
-        labelAr: option.labelAr || option.label,
-        value: option.value || option.label,
-        icon: option.icon || '',
-        active: option.active !== false,
-      }));
+    merged[key] = normalizeOptions(raw[key], fallback);
+  }
+
+  return merged;
+}
+
+export function normalizeMentorshipBriefConfig(input: unknown): MentorshipBriefConfig {
+  const raw = input && typeof input === 'object' ? (input as Partial<MentorshipBriefConfig>) : {};
+  const merged: MentorshipBriefConfig = { ...DEFAULT_MENTORSHIP_BRIEF_CONFIG, ...raw };
+
+  for (const key of mentorshipOptionListKeys) {
+    const fallback = DEFAULT_MENTORSHIP_BRIEF_CONFIG[key];
+    merged[key] = normalizeOptions(raw[key], fallback);
   }
 
   return merged;

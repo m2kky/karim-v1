@@ -53,6 +53,7 @@ export default function SubmissionsAdminPage() {
                   <TableColumn>DATE</TableColumn>
                   <TableColumn>NAME</TableColumn>
                   <TableColumn>CONTACT</TableColumn>
+                  <TableColumn>SOURCE</TableColumn>
                   <TableColumn>PROJECT</TableColumn>
                   <TableColumn>MESSAGE</TableColumn>
                   <TableColumn>STATUS</TableColumn>
@@ -66,6 +67,11 @@ export default function SubmissionsAdminPage() {
                       <TableCell>
                         <div>{item.email || '-'}</div>
                         <div className="text-xs text-gray-400">{item.phone || ''}</div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="rounded-full bg-white/5 px-2 py-1 text-xs text-gray-300">
+                          {item.source || 'contact-form'}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <div>{item.projectType || '-'}</div>

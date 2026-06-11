@@ -20,22 +20,44 @@ export default function TrainingAdminPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalState = createOverlayState(isModalOpen, setIsModalOpen);
 
+  const normalizeLines = (value: unknown) => {
+    if (Array.isArray(value)) return value.map(String).join('\n');
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) return parsed.map(String).join('\n');
+      } catch {}
+      return value;
+    }
+    return '';
+  };
+
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
     setIsLoading(true);
-    const infoData = await getTrainingInfo();
-    const statsData = await getTrainingStats();
+    try {
+      const [infoData, statsData] = await Promise.all([
+        getTrainingInfo(),
+        getTrainingStats(),
+      ]);
 
-    setInfo(infoData || {});
-    setStats(statsData || []);
-
-    if (infoData?.points) setPoints((infoData.points || []).join('\n'));
-    if (infoData?.pointsAr) setPointsAr((infoData.pointsAr || []).join('\n'));
-
-    setIsLoading(false);
+      setInfo(infoData || {});
+      setStats(Array.isArray(statsData) ? statsData : []);
+      setPoints(normalizeLines(infoData?.points));
+      setPointsAr(normalizeLines(infoData?.pointsAr));
+    } catch (error) {
+      console.error('Failed to load training page data', error);
+      toast.error('Failed to load training page data');
+      setInfo({});
+      setStats([]);
+      setPoints('');
+      setPointsAr('');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSaveInfo = async (e: React.FormEvent<HTMLFormElement>) => {

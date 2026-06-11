@@ -7,6 +7,11 @@ declare global {
     qbNext?: () => void;
     qbPrev?: () => void;
     qbSend?: (channel: string) => void;
+    mbOpen?: () => void;
+    mbClose?: () => void;
+    mbNext?: () => void;
+    mbPrev?: () => void;
+    mbSend?: (channel: string) => void;
     spaGo?: (section: string) => void;
   }
 }

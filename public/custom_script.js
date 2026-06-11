@@ -53,6 +53,11 @@ function update(){
   const counter = document.getElementById('chapterCurrent');
   counter.textContent = String(chapterIndex + 1).padStart(2, '0');
 
+  const skipBtn = document.getElementById('welcomeSkipBtn');
+  if (skipBtn) {
+    skipBtn.classList.toggle('final-centered', chapterIndex === TOTAL_CHAPTERS - 1);
+  }
+
   // Update labels
   document.querySelectorAll('.rail-label').forEach((lbl, i) => {
     lbl.classList.toggle('active', i === chapterIndex);
@@ -161,41 +166,41 @@ update();
 
 // ═══════ DATA ═══════
 const serviceWorks = {
-  editing:{title:'Video Editing',works:[
-    {cat:'Brand Film',name:'Tech Launch Video'},
-    {cat:'Music Video',name:'Indie Artist Reel'},
-    {cat:'Corporate',name:'Annual Report Film'},
-    {cat:'Cinematic',name:'Travel Diary 2025'}
+  editing:{title:'Video Editing',title_ar:'مونتاج فيديو',works:[
+    {cat:'Brand Film',cat_ar:'فيلم براند',name:'Tech Launch Video',name_ar:'فيديو إطلاق منتج تقني'},
+    {cat:'Music Video',cat_ar:'فيديو موسيقي',name:'Indie Artist Reel',name_ar:'ريل فنان مستقل'},
+    {cat:'Corporate',cat_ar:'شركات',name:'Annual Report Film',name_ar:'فيلم التقرير السنوي'},
+    {cat:'Cinematic',cat_ar:'سينمائي',name:'Travel Diary 2025',name_ar:'يوميات سفر 2025'}
   ]},
-  cinematography:{title:'Cinematography',works:[
-    {cat:'Commercial',name:'Fashion Brand Shoot'},
-    {cat:'Documentary',name:'Cairo Streets Story'},
-    {cat:'Event',name:'Wedding Cinematography'},
-    {cat:'Lifestyle',name:'Coffee Brand Visual'}
+  cinematography:{title:'Cinematography',title_ar:'تصوير سينمائي',works:[
+    {cat:'Commercial',cat_ar:'إعلان',name:'Fashion Brand Shoot',name_ar:'تصوير براند أزياء'},
+    {cat:'Documentary',cat_ar:'وثائقي',name:'Cairo Streets Story',name_ar:'حكاية شوارع القاهرة'},
+    {cat:'Event',cat_ar:'فعالية',name:'Wedding Cinematography',name_ar:'تصوير زفاف سينمائي'},
+    {cat:'Lifestyle',cat_ar:'لايف ستايل',name:'Coffee Brand Visual',name_ar:'فيديو براند قهوة'}
   ]},
-  social:{title:'Social Content',works:[
-    {cat:'Reel',name:'Viral Fashion Reel'},
-    {cat:'TikTok',name:'Food Brand Series'},
-    {cat:'Short',name:'Tech Product Demo'},
-    {cat:'Story Pack',name:'Influencer Campaign'}
+  social:{title:'Social Content',title_ar:'محتوى سوشيال',works:[
+    {cat:'Reel',cat_ar:'ريل',name:'Viral Fashion Reel',name_ar:'ريل أزياء سريع الانتشار'},
+    {cat:'TikTok',cat_ar:'تيك توك',name:'Food Brand Series',name_ar:'سلسلة براند أكل'},
+    {cat:'Short',cat_ar:'فيديو قصير',name:'Tech Product Demo',name_ar:'عرض منتج تقني'},
+    {cat:'Story Pack',cat_ar:'باقة ستوري',name:'Influencer Campaign',name_ar:'حملة مؤثرين'}
   ]},
-  documentary:{title:'Documentary & Brand',works:[
-    {cat:'Documentary',name:'The Maker Story'},
-    {cat:'Brand Film',name:'Heritage Brand Doc'},
-    {cat:'Profile',name:'Athlete Portrait'},
-    {cat:'Series',name:'Cultural Voices Series'}
+  documentary:{title:'Documentary & Brand',title_ar:'وثائقي وبراند',works:[
+    {cat:'Documentary',cat_ar:'وثائقي',name:'The Maker Story',name_ar:'حكاية الصانع'},
+    {cat:'Brand Film',cat_ar:'فيلم براند',name:'Heritage Brand Doc',name_ar:'وثائقي براند تراثي'},
+    {cat:'Profile',cat_ar:'بروفايل',name:'Athlete Portrait',name_ar:'بورتريه رياضي'},
+    {cat:'Series',cat_ar:'سلسلة',name:'Cultural Voices Series',name_ar:'سلسلة أصوات ثقافية'}
   ]},
-  mentorship:{title:'Training & Mentorship',works:[
-    {cat:'Course',name:'Premiere Pro Masterclass'},
-    {cat:'Workshop',name:'Color Grading Bootcamp'},
-    {cat:'1:1',name:'Portfolio Coaching'},
-    {cat:'Online',name:'Reels Editing Course'}
+  mentorship:{title:'Training & Mentorship',title_ar:'تدريب ومنتورنج',works:[
+    {cat:'Course',cat_ar:'كورس',name:'Premiere Pro Masterclass',name_ar:'ماستر كلاس بريمير برو'},
+    {cat:'Workshop',cat_ar:'ورشة',name:'Color Grading Bootcamp',name_ar:'ورشة تدريج ألوان'},
+    {cat:'1:1',cat_ar:'جلسة 1:1',name:'Portfolio Coaching',name_ar:'توجيه بورتفوليو'},
+    {cat:'Online',cat_ar:'أونلاين',name:'Reels Editing Course',name_ar:'كورس مونتاج ريلز'}
   ]},
-  motion:{title:'Motion & Graphics',works:[
-    {cat:'Logo Reveal',name:'Brand Identity Animation'},
-    {cat:'Title Sequence',name:'Documentary Opener'},
-    {cat:'Lower Thirds',name:'News Show Pack'},
-    {cat:'Explainer',name:'SaaS Product Animation'}
+  motion:{title:'Motion & Graphics',title_ar:'موشن وجرافيكس',works:[
+    {cat:'Logo Reveal',cat_ar:'ظهور لوجو',name:'Brand Identity Animation',name_ar:'تحريك هوية براند'},
+    {cat:'Title Sequence',cat_ar:'تتر',name:'Documentary Opener',name_ar:'افتتاحية وثائقي'},
+    {cat:'Lower Thirds',cat_ar:'عناوين سفلية',name:'News Show Pack',name_ar:'باقة برنامج إخباري'},
+    {cat:'Explainer',cat_ar:'شرح',name:'SaaS Product Animation',name_ar:'أنيميشن شرح منتج SaaS'}
   ]}
 };
 
@@ -300,14 +305,24 @@ const studentReviews = [
 // ═══════ MODAL LOGIC ═══════
 const modal = document.getElementById('modal');
 const modalClose = document.getElementById('modalClose');
+const modalEyebrow = document.getElementById('modalEyebrow');
 const modalTitle = document.getElementById('modalTitle');
 const modalWorks = document.getElementById('modalWorks');
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+})[char]);
+const currentPageLang = () => document.documentElement.lang === 'ar' ? 'ar' : 'en';
 
 document.querySelectorAll('.svc-card').forEach(card => {
   card.addEventListener('click', () => {
     const key = card.dataset.service;
     const serviceId = card.dataset.serviceId;
     const serviceTitleFromCard = card.dataset.serviceTitle || '';
+    const serviceTitleArFromCard = card.dataset.serviceTitleAr || serviceTitleFromCard;
 
       // Read dynamic works from DB (injected via client-page.tsx)
       const allWorks = window.__WORKS_DATA__ || [];
@@ -319,7 +334,16 @@ document.querySelectorAll('.svc-card').forEach(card => {
         'mentorship': 'Training & Mentorship',
         'motion': 'Motion & Graphics'
       };
+      const serviceTitleMapAr = {
+        'editing': 'مونتاج فيديو',
+        'cinematography': 'تصوير سينمائي',
+        'social': 'محتوى سوشيال',
+        'documentary': 'وثائقي وبراند',
+        'mentorship': 'تدريب ومنتورنج',
+        'motion': 'موشن وجرافيكس'
+      };
       const serviceTitle = serviceTitleFromCard || serviceTitleMap[key] || '';
+      const serviceTitleAr = serviceTitleArFromCard || serviceTitleMapAr[key] || serviceTitle;
       const normalize = (value) => String(value || '').trim().toLowerCase();
 
       const dbWorks = allWorks.filter(w => {
@@ -337,9 +361,12 @@ document.querySelectorAll('.svc-card').forEach(card => {
       if (dbWorks && dbWorks.length > 0) {
         data = {
           title: serviceTitle,
+          title_ar: serviceTitleAr,
           works: dbWorks.map(w => ({
             cat: w.category || w.title,
+            cat_ar: w.categoryAr || w.category || w.titleAr || w.title,
             name: w.title,
+            name_ar: w.titleAr || w.title,
             videoUrl: w.videoUrl,
             thumbnail: w.thumbnail
           }))
@@ -347,16 +374,26 @@ document.querySelectorAll('.svc-card').forEach(card => {
       }
 
     if (!data) return;
-    modalTitle.textContent = data.title;
+    const lang = currentPageLang();
+    const selectedWorkLabel = lang === 'ar' ? 'أعمال مختارة' : 'Selected Work';
+    const modalTitleText = lang === 'ar' ? (data.title_ar || data.title) : data.title;
+    if (modalEyebrow) {
+      modalEyebrow.dataset.en = 'Selected Work';
+      modalEyebrow.dataset.ar = 'أعمال مختارة';
+      modalEyebrow.textContent = selectedWorkLabel;
+    }
+    modalTitle.dataset.en = data.title || modalTitleText;
+    modalTitle.dataset.ar = data.title_ar || data.title || modalTitleText;
+    modalTitle.textContent = modalTitleText;
     modalWorks.innerHTML = data.works.map(w => `
       <div class="modal-work">
 
         ${w.videoUrl ?
           (w.videoUrl.includes('vimeo') || w.videoUrl.includes('youtube') || w.videoUrl.includes('drive.google')) ?
             `<div class="modal-work-video-wrapper">
-               <iframe src="${w.videoUrl}" style="width:100%; height:100%; border:none; border-radius: 12px; min-height: 200px;" allowfullscreen allow="autoplay; fullscreen"></iframe>
+               <iframe src="${escapeHtml(w.videoUrl)}" style="width:100%; height:100%; border:none; border-radius: 12px; min-height: 200px;" allowfullscreen allow="autoplay; fullscreen"></iframe>
              </div>`
-          : `<video class="modal-work-video" src="${w.videoUrl}" controls playsinline style="width:100%; border-radius: 12px;"></video>`
+          : `<video class="modal-work-video" src="${escapeHtml(w.videoUrl)}" controls playsinline style="width:100%; border-radius: 12px;"></video>`
         : `<div class="modal-work-thumb">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         </div>`
@@ -364,8 +401,8 @@ document.querySelectorAll('.svc-card').forEach(card => {
 
         <div class="modal-work-overlay">
           <div>
-            <div class="modal-work-cat">${w.cat}</div>
-            <div class="modal-work-name">${w.name}</div>
+            <div class="modal-work-cat" data-en="${escapeHtml(w.cat)}" data-ar="${escapeHtml(w.cat_ar || w.cat)}">${escapeHtml(lang === 'ar' ? (w.cat_ar || w.cat) : w.cat)}</div>
+            <div class="modal-work-name" data-en="${escapeHtml(w.name)}" data-ar="${escapeHtml(w.name_ar || w.name)}">${escapeHtml(lang === 'ar' ? (w.name_ar || w.name) : w.name)}</div>
           </div>
         </div>
       </div>
@@ -777,18 +814,22 @@ document.querySelectorAll('.count').forEach(el => countObs.observe(el));
 
 // ═══════ LANGUAGE TOGGLE ═══════
 const langBtn = document.getElementById('portfolioLangBtn');
-let currentLang = 'en';
-langBtn.addEventListener('click', () => {
-  currentLang = currentLang === 'en' ? 'ar' : 'en';
+let currentLang = document.documentElement.lang === 'ar' ? 'ar' : 'en';
+function applyLanguage(lang){
+  currentLang = lang === 'ar' ? 'ar' : 'en';
   document.documentElement.lang = currentLang;
   document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-  langBtn.textContent = currentLang === 'en' ? 'العربية' : 'English';
+  if (langBtn) langBtn.textContent = currentLang === 'en' ? 'العربية' : 'English';
   document.querySelectorAll('[data-en]').forEach(el => {
     const txt = el.getAttribute(`data-${currentLang}`);
     if (txt) {
-      if (txt.includes('<em>') || txt.includes('<strong>')) el.innerHTML = txt;
+      if (txt.includes('<')) el.innerHTML = txt;
       else el.textContent = txt;
     }
+  });
+  document.querySelectorAll('[data-en-placeholder]').forEach(el => {
+    const txt = el.getAttribute(`data-${currentLang}-placeholder`);
+    if (txt) el.setAttribute('placeholder', txt);
   });
   // Toggle elements that should only show in one language
   document.querySelectorAll('[data-en-only]').forEach(el => {
@@ -810,7 +851,16 @@ langBtn.addEventListener('click', () => {
     const txt = el.getAttribute(`data-${currentLang}-role`);
     if (txt) el.textContent = txt;
   });
-});
+  window.__CURRENT_LANG__ = currentLang;
+  document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang: currentLang } }));
+}
+window.__applyLanguage = applyLanguage;
+if (langBtn) {
+  langBtn.addEventListener('click', () => {
+    applyLanguage(currentLang === 'en' ? 'ar' : 'en');
+  });
+}
+applyLanguage(currentLang);
 
 // ═══════ REVEAL ON SCROLL ═══════
 const obs = new IntersectionObserver(entries => {
@@ -1006,8 +1056,10 @@ window.addEventListener('hashchange', function(){
     if(animatedCounters.has(el)) return;
     animatedCounters.add(el);
     const target = parseInt(el.dataset.countTarget, 10);
+    if(!Number.isFinite(target)) return;
     const duration = 1600;
     const start = performance.now();
+    el.textContent = '0';
     function tick(now){
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
@@ -1107,6 +1159,7 @@ window.addEventListener('hashchange', function(){
   }
   window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('resize', handleScroll);
+  document.addEventListener('languagechange', () => setTimeout(onScroll, 80));
 
   // Also trigger on page change
   const observer = new MutationObserver(() => {
@@ -1162,6 +1215,13 @@ window.addEventListener('hashchange', function(){
   const QB_EMAIL_TO = modal.dataset.email || 'hello@karimabdelaziz.com';
   const nameInput = document.getElementById('qbName');
   const detailsInput = document.getElementById('qbDetails');
+  function submitBrief(payload){
+    return fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(err => console.error('Brief submission failed', err));
+  }
 
   // === OPEN / CLOSE ===
   window.qbOpen = function(){
@@ -1189,10 +1249,11 @@ window.addEventListener('hashchange', function(){
 
   // === NAVIGATION ===
   function showStep(n){
-    document.querySelectorAll('.qb-step').forEach(s => s.classList.remove('active'));
-    document.querySelector(`.qb-step[data-step="${n}"]`).classList.add('active');
+    modal.querySelectorAll('.qb-step').forEach(s => s.classList.remove('active'));
+    const step = modal.querySelector(`.qb-step[data-step="${n}"]`);
+    if (step) step.classList.add('active');
     // Progress dots
-    document.querySelectorAll('.qb-progress-dot').forEach((d, idx) => {
+    modal.querySelectorAll('.qb-progress-dot').forEach((d, idx) => {
       d.classList.remove('active','done');
       if(idx + 1 < n) d.classList.add('done');
       else if(idx + 1 === n) d.classList.add('active');
@@ -1219,12 +1280,12 @@ window.addEventListener('hashchange', function(){
   };
 
   // === OPTION SELECTION ===
-  document.querySelectorAll('.qb-option').forEach(opt => {
+  modal.querySelectorAll('.qb-option').forEach(opt => {
     opt.addEventListener('click', function(){
       const field = this.dataset.field;
       const value = this.dataset.value;
       // Deselect siblings
-      document.querySelectorAll(`.qb-option[data-field="${field}"]`).forEach(s => s.classList.remove('selected'));
+      modal.querySelectorAll(`.qb-option[data-field="${field}"]`).forEach(s => s.classList.remove('selected'));
       this.classList.add('selected');
       qbData[field] = value;
       updateButtons();
@@ -1263,13 +1324,14 @@ window.addEventListener('hashchange', function(){
   window.qbSend = function(channel){
     const msg = buildMessage();
 
-    // Attempt to submit to DB via Server Action
-    if (window.submitQuickBriefAction) {
-      window.submitQuickBriefAction({
-        ...qbData,
-        source: channel
-      }).catch(err => console.error("QuickBrief DB Error", err));
-    }
+    submitBrief({
+      name: qbData.name,
+      projectType: qbData.projectType,
+      budget: qbData.budget,
+      timeline: qbData.timeline,
+      message: qbData.details || msg,
+      source: `quick-brief-${channel}`
+    });
 
     if(channel === 'whatsapp'){
       const url = `https://wa.me/${QB_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
@@ -1332,6 +1394,184 @@ Looking forward to chatting!`;
       }, true);
     }
   });
+})();
+
+
+(function(){
+  const modal = document.getElementById('mbModal');
+  if(!modal) return;
+
+  const mbData = { name: '', level: '', goal: '', format: '', timeline: '', details: '' };
+  let mbCurrentStep = 1;
+  const TOTAL_STEPS = 5;
+  const MB_WHATSAPP_NUMBER = String(modal.dataset.whatsapp || '201234567890').replace(/\D/g, '');
+  const MB_EMAIL_TO = modal.dataset.email || 'hello@karimabdelaziz.com';
+  const nameInput = document.getElementById('mbName');
+  const detailsInput = document.getElementById('mbDetails');
+  const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[char]);
+
+  function submitMentorshipBrief(payload){
+    return fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(err => console.error('Mentorship brief submission failed', err));
+  }
+
+  window.mbOpen = function(){
+    modal.classList.remove('closing');
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => nameInput && nameInput.focus(), 400);
+  };
+
+  window.mbClose = function(){
+    modal.classList.add('closing');
+    setTimeout(() => {
+      modal.classList.remove('open','closing');
+      document.body.style.overflow = '';
+    }, 400);
+  };
+
+  modal.addEventListener('click', (e) => {
+    if(e.target === modal) window.mbClose();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && modal.classList.contains('open')) window.mbClose();
+  });
+
+  function showStep(n){
+    modal.querySelectorAll('.mb-step').forEach(s => s.classList.remove('active'));
+    const step = modal.querySelector(`.mb-step[data-mb-step="${n}"]`);
+    if (step) step.classList.add('active');
+    modal.querySelectorAll('.mb-progress-dot').forEach((d, idx) => {
+      d.classList.remove('active','done');
+      if(idx + 1 < n) d.classList.add('done');
+      else if(idx + 1 === n) d.classList.add('active');
+    });
+    mbCurrentStep = n;
+    updateButtons();
+  }
+
+  window.mbNext = function(){
+    if(mbCurrentStep === 1){
+      mbData.name = nameInput.value.trim();
+      if(!mbData.name){ nameInput.focus(); return; }
+    }
+    if(mbCurrentStep === 4){
+      mbData.details = detailsInput.value.trim();
+      buildSummary();
+    }
+    if(mbCurrentStep < TOTAL_STEPS) showStep(mbCurrentStep + 1);
+  };
+
+  window.mbPrev = function(){
+    if(mbCurrentStep > 1) showStep(mbCurrentStep - 1);
+  };
+
+  modal.querySelectorAll('.mb-option').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const field = this.dataset.field;
+      const lang = document.documentElement.lang === 'ar' ? 'ar' : 'en';
+      const value = lang === 'ar' ? (this.dataset.valueAr || this.dataset.value) : this.dataset.value;
+      modal.querySelectorAll(`.mb-option[data-field="${field}"]`).forEach(s => s.classList.remove('selected'));
+      this.classList.add('selected');
+      mbData[field] = value;
+      updateButtons();
+    });
+  });
+
+  if(nameInput) nameInput.addEventListener('input', updateButtons);
+
+  function updateButtons(){
+    const step2Btn = document.getElementById('mbStep2Next');
+    const step3Btn = document.getElementById('mbStep3Next');
+    const step4Btn = document.getElementById('mbStep4Next');
+    if(step2Btn) step2Btn.disabled = !mbData.level;
+    if(step3Btn) step3Btn.disabled = !mbData.goal;
+    if(step4Btn) step4Btn.disabled = !mbData.format || !mbData.timeline;
+  }
+
+  function buildSummary(){
+    const items = document.getElementById('mbSummaryItems');
+    if(!items) return;
+    const lang = document.documentElement.lang === 'ar' ? 'ar' : 'en';
+    const labels = {
+      en: { name: 'Name', level: 'Level', goal: 'Goal', format: 'Format', timeline: 'Start' },
+      ar: { name: 'الاسم', level: 'المستوى', goal: 'الهدف', format: 'الشكل', timeline: 'البداية' }
+    };
+    items.innerHTML = `
+      <div class="qb-summary-item"><span class="qb-summary-item-key">${labels[lang].name}</span><span class="qb-summary-item-val">${escapeHtml(mbData.name)}</span></div>
+      <div class="qb-summary-item"><span class="qb-summary-item-key">${labels[lang].level}</span><span class="qb-summary-item-val">${escapeHtml(mbData.level)}</span></div>
+      <div class="qb-summary-item"><span class="qb-summary-item-key">${labels[lang].goal}</span><span class="qb-summary-item-val">${escapeHtml(mbData.goal)}</span></div>
+      <div class="qb-summary-item"><span class="qb-summary-item-key">${labels[lang].format}</span><span class="qb-summary-item-val">${escapeHtml(mbData.format)}</span></div>
+      <div class="qb-summary-item"><span class="qb-summary-item-key">${labels[lang].timeline}</span><span class="qb-summary-item-val">${escapeHtml(mbData.timeline)}</span></div>
+    `;
+  }
+
+  window.mbSend = function(channel){
+    const msg = buildMessage();
+    submitMentorshipBrief({
+      name: mbData.name,
+      projectType: 'Mentorship',
+      budget: mbData.format,
+      timeline: mbData.timeline,
+      message: [
+        `Level: ${mbData.level}`,
+        `Goal: ${mbData.goal}`,
+        `Format: ${mbData.format}`,
+        mbData.details ? `Details: ${mbData.details}` : ''
+      ].filter(Boolean).join('\n'),
+      source: `mentorship-brief-${channel}`
+    });
+
+    if(channel === 'whatsapp'){
+      const url = `https://wa.me/${MB_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+      window.mbClose();
+    } else if(channel === 'email'){
+      const subject = encodeURIComponent(`Mentorship Inquiry: ${mbData.goal}`);
+      const body = encodeURIComponent(msg);
+      window.location.href = `mailto:${MB_EMAIL_TO}?subject=${subject}&body=${body}`;
+      window.mbClose();
+    }
+  };
+
+  function buildMessage(){
+    const lang = document.documentElement.lang === 'ar' ? 'ar' : 'en';
+    if(lang === 'ar'){
+      return `أهلاً كريم، أنا ${mbData.name}.
+
+عايز منتورنج:
+المستوى: ${mbData.level}
+الهدف: ${mbData.goal}
+الشكل: ${mbData.format}
+البداية: ${mbData.timeline}
+${mbData.details ? '\nتفاصيل: ' + mbData.details : ''}
+
+مستني ردك.`;
+    }
+
+    return `Hi Karim,
+
+I'm ${mbData.name}, looking for mentorship:
+Level: ${mbData.level}
+Goal: ${mbData.goal}
+Format: ${mbData.format}
+Start: ${mbData.timeline}
+${mbData.details ? '\nDetails: ' + mbData.details : ''}
+
+Looking forward to chatting.`;
+  }
+
+  updateButtons();
 })();
 
 

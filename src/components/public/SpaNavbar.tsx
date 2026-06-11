@@ -11,16 +11,8 @@ const NAV_LINKS = [
   { href: 'contact', label: 'Contact', labelAr: 'تواصل' },
 ];
 
-const STATUSES = [
-  { en: "Available for freelance", ar: "متاح للعمل الحر" },
-  { en: "Cinematic storytelling", ar: "سرد سينمائي" },
-  { en: "Based in Cairo", ar: "مقيم في القاهرة" },
-  { en: "Videos that perform", ar: "فيديوهات تحقق نتائج" }
-];
-
 export function SpaNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [statusIndex, setStatusIndex] = useState(0);
   const overlayRef = useRef<HTMLDivElement>(null);
   const menuTitleRef = useRef<HTMLHeadingElement>(null);
   const linksRef = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -71,13 +63,6 @@ export function SpaNavbar() {
     }
   }, [mobileOpen]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStatusIndex((prev) => (prev + 1) % STATUSES.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
     setMobileOpen(false);
@@ -112,29 +97,6 @@ export function SpaNavbar() {
               {item.label}
             </a>
           ))}
-        </div>
-
-        {/* Dynamic Status Ticker (Mobile Only) */}
-        <div className="flex-1 flex items-center justify-center overflow-hidden md:hidden" style={{ margin: '0 16px' }}>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.05)]">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" style={{ boxShadow: '0 0 10px rgba(34, 197, 94, 0.6)' }} />
-            <div className="relative h-5 overflow-hidden w-[140px] flex items-center justify-center">
-              {STATUSES.map((status, idx) => (
-                <span
-                  key={idx}
-                  className="absolute whitespace-nowrap text-[12px] font-medium tracking-[0.5px] text-[var(--muted)] transition-all duration-500"
-                  style={{
-                    transform: `translateY(${idx === statusIndex ? 0 : 20}px)`,
-                    opacity: idx === statusIndex ? 1 : 0,
-                  }}
-                  data-en={status.en}
-                  data-ar={status.ar}
-                >
-                  {status.en}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Desktop actions */}

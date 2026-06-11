@@ -6,6 +6,16 @@ import { eq, and } from 'drizzle-orm';
 import { asc } from '@/lib/db-order';
 import { revalidatePath } from 'next/cache';
 
+function parsePoints(value: FormDataEntryValue | null) {
+  if (typeof value !== 'string' || !value.trim()) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : [];
+  } catch {
+    return value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+  }
+}
+
 export async function getTrainingInfo() {
   const [data] = await db.select().from(trainingInfo).limit(1);
   return data ?? null;
@@ -27,8 +37,8 @@ export async function updateTrainingInfo(formData: FormData) {
     titleAr: (formData.get('titleAr') as string) || null,
     description: (formData.get('description') as string) || null,
     descriptionAr: (formData.get('descriptionAr') as string) || null,
-    points: JSON.parse((formData.get('points') as string) || '[]'),
-    pointsAr: JSON.parse((formData.get('pointsAr') as string) || '[]'),
+    points: parsePoints(formData.get('points')),
+    pointsAr: parsePoints(formData.get('pointsAr')),
     updatedAt: new Date(),
   };
 
